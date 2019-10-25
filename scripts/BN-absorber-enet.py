@@ -14,7 +14,7 @@ from argparse import ArgumentParser
 from os.path import join
 import argparse
 import sys
-caffe_root = 'ENet/caffe-enet/'  # Change this to the absolute directory to SegNet Caffe
+caffe_root = '/home/nvidia/segmentation/ENet/caffe-enet/'  # Change this to the absolute directory to SegNet Caffe
 sys.path.insert(0, caffe_root + 'python')
 import caffe
 from caffe.proto import caffe_pb2

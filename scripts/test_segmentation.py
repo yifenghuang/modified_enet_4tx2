@@ -9,12 +9,13 @@ from argparse import ArgumentParser
 from os.path import join
 import argparse
 import sys
-caffe_root = 'ENet/caffe-enet/'  # Change this to the absolute directory to ENet Caffe
+caffe_root = '/home/nvidia/segmentation/ENet/caffe-enet/'  # Change this to the absolute directory to ENet Caffe
 sys.path.insert(0, caffe_root + 'python')
 import caffe
 sys.path.append('/usr/local/lib/python2.7/site-packages')
 import cv2
-
+import copy
+from moviepy.editor import VideoFileClip
 
 __author__ = 'Timo Sämann'
 __university__ = 'Aschaffenburg University of Applied Sciences'
@@ -34,27 +35,11 @@ def make_parser():
 
     return parser
 
-
-if __name__ == '__main__':
-    parser1 = make_parser()
-    args = parser1.parse_args()
-    if args.gpu == 0:
-        caffe.set_mode_gpu()
-    else:
-        caffe.set_mode_cpu()
-
-    net = caffe.Net(args.model, args.weights, caffe.TEST)
-
-    input_shape = net.blobs['data'].data.shape
-    output_shape = net.blobs['deconv6_0_0'].data.shape
-
-    label_colours = cv2.imread(args.colours, 1).astype(np.uint8)
-    input_image = cv2.imread(args.input_image, 1).astype(np.float32)
-
-    input_image = cv2.resize(input_image, (input_shape[3], input_shape[2]))
+def process_image(img):
+    #input_image = cv2.imread(img, 1).astype(np.float32)
+    input_image = cv2.resize(img, (input_shape[3], input_shape[2]))
     input_image = input_image.transpose((2, 0, 1))
     input_image = np.asarray([input_image])
-
     out = net.forward_all(**{net.inputs[0]: input_image})
 
     prediction = net.blobs['deconv6_0_0'].data[0].argmax(axis=0)
@@ -66,10 +51,33 @@ if __name__ == '__main__':
     prediction_rgb = np.zeros(prediction.shape, dtype=np.uint8)
     label_colours_bgr = label_colours[..., ::-1]
     cv2.LUT(prediction, label_colours_bgr, prediction_rgb)
+    return prediction_rgb
 
-    cv2.imshow("ENet", prediction_rgb)
-    key = cv2.waitKey(0)
+if __name__ == '__main__':
+    parser1 = make_parser()
+    args = parser1.parse_args()
+    #if args.gpu == 0:
+    caffe.set_mode_gpu()
+    #else:
+    #    caffe.set_mode_cpu()
 
+    net = caffe.Net(args.model, args.weights, caffe.TEST)
+
+    input_shape = net.blobs['data'].data.shape
+    output_shape = net.blobs['deconv6_0_0'].data.shape
+
+    label_colours = cv2.imread(args.colours, 1).astype(np.uint8)
+    
+
+    #prediction_rgb = process_image(args.input_image) #image processing
+    white_output = 'video_processed.mp4'
+    clip1 = VideoFileClip("IMG_5195.mp4")
+    white_clip = clip1.fl_image(process_image)
+    white_clip.write_videofile(white_output, audio=False)
+
+    #cv2.imshow("ENet", prediction_rgb)
+    #key = cv2.waitKey(0)
+"""
     if args.out_dir is not None:
         input_path_ext = args.input_image.split(".")[-1]
         input_image_name = args.input_image.split("/")[-1:][0].replace('.' + input_path_ext, '')
@@ -79,7 +87,7 @@ if __name__ == '__main__':
         cv2.imwrite(out_path_im, prediction_rgb)
         # cv2.imwrite(out_path_gt, prediction) #  label images, where each pixel has an ID that represents the class
 
-
+"""
 
 
 

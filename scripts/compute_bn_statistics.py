@@ -17,7 +17,7 @@ import numpy as np
 from skimage.io import ImageCollection
 from argparse import ArgumentParser
 from os.path import join
-caffe_root = 'ENet/caffe-enet/'	# Change this to the absolute directoy to SegNet Caffe
+caffe_root = '/home/nvidia/segmentation/ENet/caffe-enet/'	# Change this to the absolute directoy to SegNet Caffe
 import sys
 sys.path.insert(0, caffe_root + 'python')
 import caffe

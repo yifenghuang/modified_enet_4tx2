@@ -11,7 +11,7 @@ and also the mode in which it should operate (--mode). The following modes are a
 """
 import argparse
 import os
-caffe_root = 'ENet/caffe-enet/'  # Change this to the absolute directory to SegNet Caffe
+caffe_root = '/home/nvidia/segmentation/ENet/caffe-enet/'  # Change this to the absolute directory to SegNet Caffe
 import sys
 sys.path.insert(0, caffe_root + 'python')
 import caffe
